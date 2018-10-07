@@ -8,5 +8,5 @@ Do update_name via CloudWatch Event.
 
 ## local invoke
 
-1. cp event.json.sample event.json
+1. `cp event.json.sample event.json`
 2. `make invoke`
