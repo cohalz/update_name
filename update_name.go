@@ -95,12 +95,14 @@ func checkTweetsAndUpdateName(api *anaconda.TwitterApi, tweets []anaconda.Tweet,
 
 		for _, prefixRule := range trigger.PrefixRules {
 			if strings.HasSuffix(text, prefixRule) {
+				api.Favorite(tweet.Id)
 				updateProfile(api, text)
 			}
 		}
 
 		for _, suffixRule := range trigger.SuffixRules {
 			if strings.HasSuffix(text, suffixRule) {
+				api.Favorite(tweet.Id)
 				updateProfile(api, text)
 			}
 		}
