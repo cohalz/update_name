@@ -1,0 +1,12 @@
+{
+    "trigger": {
+        "prefixRules": ["犬", "はる"],
+        "suffixRules": ["@cohalz update_name"]
+    },
+    "credential": {
+        "access_token": "",
+        "access_token_secret": "",
+        "consumer_key": "",
+        "consumer_secret": "",
+    }
+} 

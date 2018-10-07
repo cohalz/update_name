@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: update_name
+ 
+Resources:
+  UpdateName:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: update_name
+      CodeUri: build
+      Handler: update_name
+      Runtime: go1.x
+      Timeout: 5
+      MemorySize: 128
+      Role: !GetAtt RoleForUpdateName.Arn
+  
+  LogGroupForUpdateName:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UpdateName}
+      RetentionInDays: 14
+
+  RoleForUpdateName:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "role_for_update_name"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: PolicyForUpdateName
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+                - Effect: Allow
+                  Action: "lambda:UpdateFunctionConfiguration"
+                  Resource: "*"
