@@ -47,15 +47,22 @@ func main() {
 }
 
 func handleLambdaEvent(ctx context.Context, e Event) error {
+
 	api := getAPIFromCredential(e.Credential)
 
-	tweets := getTimeLine(api)
+	user, err := api.GetSelf(url.Values{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tweets := getTimeLine(api, user.ScreenName)
 
 	checkTweetsAndUpdateName(api, tweets, e.Rules)
 
 	functionName := lambdacontext.FunctionName
 	if functionName != "test" {
-		setSinceIDToEnv(functionName, tweets[0].Id)
+
+		setSinceIDToEnv(functionName, user.ScreenName, tweets[0].Id)
 	}
 
 	return nil
@@ -71,11 +78,11 @@ func getAPIFromCredential(credential Credential) *anaconda.TwitterApi {
 	)
 }
 
-func getTimeLine(api *anaconda.TwitterApi) []anaconda.Tweet {
+func getTimeLine(api *anaconda.TwitterApi, sceenName string) []anaconda.Tweet {
 	v := url.Values{}
 	v.Set("count", "200")
 	v.Set("include_rts", "false")
-	sinceID, exists := os.LookupEnv("sinceID")
+	sinceID, exists := os.LookupEnv("sinceID_" + sceenName)
 	if exists {
 		v.Set("since_id", sinceID)
 	}
@@ -153,7 +160,7 @@ func updateProfile(api *anaconda.TwitterApi, newName string) {
 	}
 }
 
-func setSinceIDToEnv(functionName string, sinceID int64) {
+func setSinceIDToEnv(functionName string, screenName string, sinceID int64) {
 	sinceIDStr := strconv.FormatInt(sinceID, 10)
 
 	sess := session.Must(session.NewSession())
@@ -164,7 +171,18 @@ func setSinceIDToEnv(functionName string, sinceID int64) {
 	)
 
 	m := make(map[string]*string)
-	m["sinceID"] = &sinceIDStr
+
+	envs := os.Environ()
+
+	for _, env := range envs {
+		if !strings.HasPrefix(env, "sinceID_") {
+			continue
+		}
+		envKeyValue := strings.SplitN(env, "=", 2)
+		m["sinceID_"+envKeyValue[0]] = &envKeyValue[1]
+	}
+
+	m["sinceID_"+screenName] = &sinceIDStr
 
 	env := &lambda_sdk.Environment{
 		Variables: m,
