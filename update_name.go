@@ -96,11 +96,11 @@ func getTimeLine(api *anaconda.TwitterApi, sceenName string) []anaconda.Tweet {
 }
 
 func checkTweetsAndUpdateName(api *anaconda.TwitterApi, tweets []anaconda.Tweet, rules []Rule) {
-	for _, rule := range rules {
-		for _, tweet := range tweets {
+	for _, tweet := range tweets {
+		for _, rule := range rules {
 			if textIsMatchTrigger(tweet.FullText, rule) {
 				updateTwitter(api, tweet, rule)
-				return
+				break
 			}
 		}
 	}
