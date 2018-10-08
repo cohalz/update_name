@@ -179,7 +179,7 @@ func setSinceIDToEnv(functionName string, screenName string, sinceID int64) {
 			continue
 		}
 		envKeyValue := strings.SplitN(env, "=", 2)
-		m["sinceID_"+envKeyValue[0]] = &envKeyValue[1]
+		m[envKeyValue[0]] = &envKeyValue[1]
 	}
 
 	m["sinceID_"+screenName] = &sinceIDStr
