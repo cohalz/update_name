@@ -3,16 +3,19 @@ cfn_cmd = aws --profile $(profile) cloudformation
 clean:
 	rm -rf build/update_name
 
-build:
+deps:
+	dep ensure -vendor-only
+
+build: deps
 	make clean
 	GOARCH=amd64 GOOS=linux go build -o build/update_name
 
-invoke:
+invoke: deps
 	make clean
 	GOARCH=amd64 GOOS=linux go build -o build/update_name
 	sam local invoke -e event.json
 
-deploy:
+deploy: deps
 	GOARCH=amd64 GOOS=linux go build -o build/update_name
 	$(cfn_cmd) package \
 		--template-file template.yml \
