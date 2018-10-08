@@ -10,3 +10,6 @@ Do update_name via CloudWatch Event.
 
 1. `cp event.json.sample event.json`
 2. `make invoke`
+
+## Author
+[cohalz](https://github.com/cohalz)
