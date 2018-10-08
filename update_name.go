@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -19,22 +20,24 @@ import (
 
 //Credential is credential for Twitter API
 type Credential struct {
-	AccessToken       string `json:"access_token"`
-	AccessTokenSecret string `json:"access_token_secret"`
-	ConsumerKey       string `json:"consumer_key"`
-	ConsumerSecret    string `json:"consumer_secret"`
+	AccessToken       string `json:"accessToken"`
+	AccessTokenSecret string `json:"accessTokenSecret"`
+	ConsumerKey       string `json:"consumerKey"`
+	ConsumerSecret    string `json:"consumerSecret"`
 }
 
 //Event is Input for Lambda
 type Event struct {
-	Trigger    Trigger    `json:"trigger"`
+	Rules      []Rule     `json:"rules"`
 	Credential Credential `json:"credential"`
 }
 
-//Trigger is rules for update_name
-type Trigger struct {
-	PrefixRules []string `json:"prefixRules"`
-	SuffixRules []string `json:"suffixRules"`
+//Rule is rules for update_name
+type Rule struct {
+	TriggerType     string `json:"triggerType"`
+	TriggerWord     string `json:"triggerWord"`
+	OmitTriggerWord bool   `json:"omitTriggerWord"`
+	ReplyFormat     string `json:"replyFormat"`
 }
 
 func main() {
@@ -48,7 +51,7 @@ func handleLambdaEvent(ctx context.Context, e Event) error {
 
 	tweets := getTimeLine(api)
 
-	checkTweetsAndUpdateName(api, tweets, e.Trigger)
+	checkTweetsAndUpdateName(api, tweets, e.Rules)
 
 	functionName := lambdacontext.FunctionName
 	if functionName != "test" {
@@ -85,28 +88,47 @@ func getTimeLine(api *anaconda.TwitterApi) []anaconda.Tweet {
 	return tweets
 }
 
-func checkTweetsAndUpdateName(api *anaconda.TwitterApi, tweets []anaconda.Tweet, trigger Trigger) {
+func checkTweetsAndUpdateName(api *anaconda.TwitterApi, tweets []anaconda.Tweet, rules []Rule) {
 
 	for _, tweet := range tweets {
-		text := tweet.FullText
-		if utf8.RuneCountInString(text) > 50 {
+		if utf8.RuneCountInString(tweet.FullText) > 50 {
 			continue
 		}
 
-		for _, prefixRule := range trigger.PrefixRules {
-			if strings.HasSuffix(text, prefixRule) {
-				api.Favorite(tweet.Id)
-				updateProfile(api, text)
+		for _, rule := range rules {
+			if textIsMatchTrigger(tweet.FullText, rule) {
+				updateTwitter(api, tweet, rule)
 			}
 		}
+	}
+}
 
-		for _, suffixRule := range trigger.SuffixRules {
-			if strings.HasSuffix(text, suffixRule) {
-				api.Favorite(tweet.Id)
-				updateProfile(api, text)
-			}
-		}
+func textIsMatchTrigger(text string, rule Rule) bool {
+	switch rule.TriggerType {
+	case "prefix":
+		return strings.HasPrefix(text, rule.TriggerWord)
+	case "suffix":
+		return strings.HasSuffix(text, rule.TriggerWord)
+	default:
+		return false
+	}
+}
 
+func updateTwitter(api *anaconda.TwitterApi, tweet anaconda.Tweet, rule Rule) {
+	api.Favorite(tweet.Id)
+
+	newName := tweet.FullText
+	if rule.OmitTriggerWord {
+		newName = strings.Replace(tweet.FullText, rule.TriggerWord, "", -1)
+	}
+
+	updateProfile(api, newName)
+
+	if rule.ReplyFormat != "" {
+		newTweet := fmt.Sprintf("@"+tweet.User.ScreenName+" "+rule.ReplyFormat, newName)
+		v := url.Values{}
+		v.Set("in_reply_to_status_id", strconv.FormatInt(tweet.Id, 10))
+		api.PostTweet(newTweet, v)
 	}
 }
 
