@@ -89,15 +89,11 @@ func getTimeLine(api *anaconda.TwitterApi) []anaconda.Tweet {
 }
 
 func checkTweetsAndUpdateName(api *anaconda.TwitterApi, tweets []anaconda.Tweet, rules []Rule) {
-
-	for _, tweet := range tweets {
-		if utf8.RuneCountInString(tweet.FullText) > 50 {
-			continue
-		}
-
-		for _, rule := range rules {
+	for _, rule := range rules {
+		for _, tweet := range tweets {
 			if textIsMatchTrigger(tweet.FullText, rule) {
 				updateTwitter(api, tweet, rule)
+				return
 			}
 		}
 	}
@@ -109,18 +105,32 @@ func textIsMatchTrigger(text string, rule Rule) bool {
 		return strings.HasPrefix(text, rule.TriggerWord)
 	case "suffix":
 		return strings.HasSuffix(text, rule.TriggerWord)
+	case "ng":
+		return strings.Contains(text, rule.TriggerWord)
 	default:
 		return false
 	}
 }
 
 func updateTwitter(api *anaconda.TwitterApi, tweet anaconda.Tweet, rule Rule) {
-	api.Favorite(tweet.Id)
-
 	newName := tweet.FullText
 	if rule.OmitTriggerWord {
 		newName = strings.Replace(tweet.FullText, rule.TriggerWord, "", -1)
 	}
+
+	if rule.TriggerType == "ng" {
+		newTweet := fmt.Sprintf("@" + tweet.User.ScreenName + " " + rule.ReplyFormat)
+		v := url.Values{}
+		v.Set("in_reply_to_status_id", strconv.FormatInt(tweet.Id, 10))
+		api.PostTweet(newTweet, v)
+		return
+	}
+
+	if utf8.RuneCountInString(newName) > 50 {
+		return
+	}
+
+	api.Favorite(tweet.Id)
 
 	updateProfile(api, newName)
 
