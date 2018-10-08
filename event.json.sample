@@ -1,8 +1,21 @@
 {
     "rules": [
         {
+            "triggerType": "ng",
+            "triggerword": "うんこはる",
+            "replyFormat": "だまれ"
+        },
+        {
             "triggerType": "suffix",
             "triggerword": "犬"
+        },
+        {
+            "triggerType": "suffix",
+            "triggerword": "いぬ"
+        },
+        {
+            "triggerType": "suffix",
+            "triggerword": "イヌ"
         },
         {
             "triggerType": "suffix",

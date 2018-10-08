@@ -10,7 +10,7 @@ Resources:
       CodeUri: build
       Handler: update_name
       Runtime: go1.x
-      Timeout: 5
+      Timeout: 10
       MemorySize: 128
       Role: !GetAtt RoleForUpdateName.Arn
   
