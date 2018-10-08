@@ -1,12 +1,30 @@
 {
-    "trigger": {
-        "prefixRules": ["犬", "はる"],
-        "suffixRules": ["@cohalz update_name"]
-    },
+    "rules": [
+        {
+            "triggerType": "suffix",
+            "triggerword": "犬"
+        },
+        {
+            "triggerType": "suffix",
+            "triggerword": "はる"
+        },
+        {
+            "triggerType": "prefix",
+            "triggerword": "@cohalz update_name ",
+            "omitTriggerWord": true,
+            "replyFormat": "%sになりました"
+        },
+        {
+            "triggerType": "suffix",
+            "triggerword": "(@cohalz)",
+            "omitTriggerWord": true,
+            "replyFormat": "%sになりました"
+        }
+    ],
     "credential": {
-        "access_token": "",
-        "access_token_secret": "",
-        "consumer_key": "",
-        "consumer_secret": "",
+        "accessToken": "",
+        "accessTokenSecret": "",
+        "consumerKey": "",
+        "consumerSecret": ""
     }
 } 
