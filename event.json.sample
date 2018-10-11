@@ -2,34 +2,34 @@
     "rules": [
         {
             "triggerType": "ng",
-            "triggerword": "うんこはる",
+            "triggerWord": "うんこはる",
             "replyFormat": "だまれ"
         },
         {
             "triggerType": "suffix",
-            "triggerword": "犬"
+            "triggerWord": "犬"
         },
         {
             "triggerType": "suffix",
-            "triggerword": "いぬ"
+            "triggerWord": "いぬ"
         },
         {
             "triggerType": "suffix",
-            "triggerword": "イヌ"
+            "triggerWord": "イヌ"
         },
         {
             "triggerType": "suffix",
-            "triggerword": "はる"
+            "triggerWord": "はる"
         },
         {
             "triggerType": "prefix",
-            "triggerword": "@cohalz update_name ",
+            "triggerWord": "@cohalz update_name ",
             "omitTriggerWord": true,
             "replyFormat": "%sになりました"
         },
         {
             "triggerType": "suffix",
-            "triggerword": "(@cohalz)",
+            "triggerWord": "(@cohalz)",
             "omitTriggerWord": true,
             "replyFormat": "%sになりました"
         }
