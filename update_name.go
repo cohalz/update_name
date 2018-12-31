@@ -121,8 +121,13 @@ func textIsMatchTrigger(text string, rule Rule) bool {
 
 func updateTwitter(api *anaconda.TwitterApi, tweet anaconda.Tweet, rule Rule) {
 	newName := tweet.FullText
+
+	if newName[0:1] == "@" {
+		newName = strings.SplitN(newName, " ", 2)[1]
+	}
+
 	if rule.OmitTriggerWord {
-		newName = strings.Replace(tweet.FullText, rule.TriggerWord, "", -1)
+		newName = strings.Replace(newName, rule.TriggerWord, "", -1)
 	}
 
 	if rule.TriggerType == "ng" {
