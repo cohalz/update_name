@@ -1,0 +1,6 @@
+pipeline:
+  build:
+    image: lambci/lambda:build-go1.x
+    commands:
+      - go get
+      - go build
