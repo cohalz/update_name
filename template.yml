@@ -18,7 +18,7 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${UpdateName}
-      RetentionInDays: 14
+      RetentionInDays: 7
 
   RoleForUpdateName:
     Type: "AWS::IAM::Role"
@@ -38,4 +38,10 @@ Resources:
             Statement:
                 - Effect: Allow
                   Action: "lambda:UpdateFunctionConfiguration"
+                  Resource: "*"
+                - Effect: Allow
+                  Action:
+                    - "logs:CreateLogGroup"
+                    - "logs:CreateLogStream"
+                    - "logs:PutLogEvents"
                   Resource: "*"
